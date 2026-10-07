@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lab 7</title>
+  </head>
+  <body>
+    <button id="button">Play Me!</button>
+    <div id="note-display">Playing Note:</div>
+
+    <button id="button2">Play Me!</button>
+    <div id="note-display2">Playing Note:</div>
+
+    <script>
+      function playNote(
+        someContext,
+        frequency,
+        duration,
+        attackTime,
+        waveForm,
+      ) {
+        if (someContext.state === "suspended") {
+          someContext.resume();
+        }
+
+        const osc1 = new OscillatorNode(someContext);
+        const osc2 = new OscillatorNode(someContext);
+        const osc3 = new OscillatorNode(someContext);
+        const gain = new GainNode(someContext);
+
+        osc1.frequency.value = frequency;
+        osc2.frequency.value = frequency * 2.01;
+        osc3.frequency.value = frequency * 3.02;
+        osc1.type = waveForm;
+        osc2.type = waveForm;
+        osc3.type = waveForm;
+        gain.gain.value = 0;
+
+        osc1.connect(gain).connect(someContext.destination);
+        osc2.connect(gain).connect(someContext.destination);
+        osc3.connect(gain).connect(someContext.destination);
+
+        let now = someContext.currentTime;
+
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.exponentialRampToValueAtTime(
+          0.3,
+          now + duration * attackTime,
+        ); //attack
+        gain.gain.exponentialRampToValueAtTime(
+          0.1,
+          now * 0.01 + duration * 0.2,
+        ); // decay
+        gain.gain.exponentialRampToValueAtTime(
+          0.05,
+          now * 0.01 * 0.2 + duration * 0.2,
+        ); //sustain
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration * 1); //release
+
+        osc1.start();
+        osc1.stop(now + duration);
+
+        osc2.start();
+        osc2.stop(now + duration);
+
+        osc3.start();
+        osc3.stop(now + duration);
+      }
+
+      const midiPitches = [69, 71, 73, 75, 76, 78, 80, 81]; // A Lydian
+
+      const noteNames = {
+        69: "A4",
+        71: "B4",
+        73: "C#5",
+        75: "D#5",
+        76: "E5",
+        78: "F#5",
+        80: "G#5",
+        81: "A5",
+      };
+
+      const randomPitchData = function () {
+        let randomMidiNote =
+          midiPitches[Math.floor(Math.random() * midiPitches.length)];
+
+        let newFreq = 440 * 2 ** ((randomMidiNote - 69) / 12);
+
+        return {
+          frequency: newFreq,
+          name: noteNames[randomMidiNote],
+        };
+      };
+
+      const randomDuration = function () {
+        return Math.random() * 2 + 0.1;
+      };
+
+      const waveForms = ["sine", "square", "sawtooth", "triangle"];
+
+      const randomWaveForm = function () {
+        return waveForms[Math.floor(Math.random() * waveForms.length)];
+      };
+
+      const myCtx = new AudioContext();
+
+      document.querySelector("#button").onclick = () => {
+        const noteData = randomPitchData();
+
+        document.querySelector("#note-display").textContent =
+          `Playing Note: ${noteData.name}`;
+
+        playNote(
+          myCtx,
+          noteData.frequency,
+          randomDuration(),
+          0.1,
+          randomWaveForm(),
+        );
+      };
+
+      // Second Button
+
+      function playNote2(
+        someContext,
+        frequency,
+        duration,
+        attackTime,
+        randomWaveForm,
+      ) {
+        if (someContext.state === "suspended") {
+          someContext.resume();
+        }
+
+        const osc4 = new OscillatorNode(someContext);
+        const osc5 = new OscillatorNode(someContext);
+        const osc6 = new OscillatorNode(someContext);
+        const gain = new GainNode(someContext);
+
+        osc4.frequency.value = frequency;
+        osc5.frequency.value = frequency * 2.01;
+        osc6.frequency.value = frequency * 3.02;
+        osc4.type = randomWaveForm;
+        osc5.type = randomWaveForm;
+        osc6.type = randomWaveForm;
+        gain.gain.value = 0;
+
+        osc4.connect(gain).connect(someContext.destination);
+        osc5.connect(gain).connect(someContext.destination);
+        osc6.connect(gain).connect(someContext.destination);
+
+        let now = someContext.currentTime;
+
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.exponentialRampToValueAtTime(
+          0.3,
+          now + duration * attackTime,
+        ); //attack
+        gain.gain.exponentialRampToValueAtTime(
+          0.1,
+          now * 0.01 + duration * 0.2,
+        ); // decay
+        gain.gain.exponentialRampToValueAtTime(
+          0.05,
+          now * 0.01 * 0.2 + duration * 0.2,
+        ); //sustain
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration * 1); //release
+
+        osc4.start();
+        osc4.stop(now + duration);
+
+        osc5.start();
+        osc5.stop(now + duration);
+
+        osc6.start();
+        osc6.stop(now + duration);
+      }
+
+      const midiPitches2 = [56, 59, 61, 63, 66, 68]; // G# Pentatonic
+
+      const noteNames2 = {
+        56: "G#3",
+        59: "B3",
+        61: "C#4",
+        63: "D#4",
+        66: "F#4",
+        68: "G#4",
+      };
+
+      const randomPitchData2 = function () {
+        let randomMidiNote2 =
+          midiPitches2[Math.floor(Math.random() * midiPitches2.length)];
+
+        let newFreq2 = 440 * 2 ** ((randomMidiNote2 - 69) / 12);
+
+        return {
+          frequency: newFreq2,
+          name: noteNames2[randomMidiNote2],
+        };
+      };
+
+      const randomDuration2 = function () {
+        return Math.random() * 1 + 0.1;
+        2;
+      };
+
+      const waveForms2 = ["sine", "square", "sawtooth", "triangle"];
+
+      const randomWaveForm2 = function () {
+        return waveForms2[Math.floor(Math.random() * waveForms2.length)];
+      };
+
+      const myCtx2 = new AudioContext();
+
+      document.querySelector("#button2").onclick = () => {
+        const noteData2 = randomPitchData2();
+
+        document.querySelector("#note-display2").textContent =
+          `Playing Note: ${noteData2.name}`;
+
+        playNote2(
+          myCtx2,
+          noteData2.frequency,
+          randomDuration2(),
+          0.1,
+          randomWaveForm2(),
+        );
+      };
+    </script>
+  </body>
+</html>
